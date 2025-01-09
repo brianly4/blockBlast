@@ -1,5 +1,11 @@
 package nguyen.viet;
-
+/**
+ * Purpose: Create a die 
+ * 
+ * 
+ * @author V. Nguyen
+ * @date December 30, 2024
+ */
 import java.util.Random;
 
 public class Die {

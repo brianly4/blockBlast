@@ -1,5 +1,11 @@
 package nguyen.viet;
-
+/**
+ * Purpose: Tile Logic
+ *
+ * 
+ * @author V. Nguyen
+ * @date December 30, 2024
+ */
 public class Tile {
 	private int value;
 	private boolean isUp;
