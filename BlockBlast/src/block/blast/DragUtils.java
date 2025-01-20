@@ -11,6 +11,8 @@ public class DragUtils {
     private static double startX;
     private static double startY;
 
+    private static int blocksPlaced = 0;
+
     public static void makeDraggable(Pane blockPane, GameBoard gameBoard, Pane gameLayout) {
         final double[] offset = new double[2];
 
@@ -30,11 +32,19 @@ public class DragUtils {
             double x = blockPane.getLayoutX();
             double y = blockPane.getLayoutY();
 
+            // Debugging output
+            System.out.println("Mouse released at: " + x + ", " + y);
+
             if (isWithinBounds(x, y, gameBoard.getGameBoard())) {
                 if (canPlaceBlock(blockPane, gameBoard)) {
                     attachBlockToBoard(blockPane, gameBoard);
                     gameLayout.getChildren().remove(blockPane);
-                    spawnNewBlock(gameLayout, gameBoard);
+                    blocksPlaced++;
+
+                    if (blocksPlaced == 3) {
+                        blocksPlaced = 0;
+                        spawnNewBlocks(gameLayout, gameBoard);
+                    }
                 } else {
                     System.out.println("Block placement failed: At least one cell is occupied.");
                     blockPane.setLayoutX(startX);
@@ -45,6 +55,7 @@ public class DragUtils {
                 blockPane.setLayoutX(startX);
                 blockPane.setLayoutY(startY);
             }
+
         });
     }
 
@@ -66,6 +77,7 @@ public class DragUtils {
             int gridCol = startCol + (int) Math.round(tile.getX() / tileSize);
             int gridRow = startRow + (int) Math.round(tile.getY() / tileSize);
 
+            // Check for bounds and occupancy
             if (gridRow < 0 || gridRow >= 10 || gridCol < 0 || gridCol >= 10
                     || gameBoard.isTileOccupied(gridRow, gridCol)) {
                 return false;
@@ -76,60 +88,49 @@ public class DragUtils {
     }
 
     private static void attachBlockToBoard(Pane blockPane, GameBoard gameBoard) {
-        double x = blockPane.getLayoutX();
-        double y = blockPane.getLayoutY();
         double tileSize = gameBoard.getTileSize();
+        double startX = blockPane.getLayoutX();
+        double startY = blockPane.getLayoutY();
 
-        int col = (int) ((x - gameBoard.getGameBoard().getLayoutX()) / tileSize);
-        int row = (int) ((y - gameBoard.getGameBoard().getLayoutY()) / tileSize);
+        int startCol = (int) Math.round((startX - gameBoard.getGameBoard().getLayoutX()) / tileSize);
+        int startRow = (int) Math.round((startY - gameBoard.getGameBoard().getLayoutY()) / tileSize);
 
-        // Check if the block overlaps with any occupied tile
+        // Add each tile of the block to the grid
         for (int i = 0; i < blockPane.getChildren().size(); i++) {
-            double childX = blockPane.getChildren().get(i).getLayoutX() + col * tileSize;
-            double childY = blockPane.getChildren().get(i).getLayoutY() + row * tileSize;
+            Rectangle tile = (Rectangle) blockPane.getChildren().get(i);
 
-            int gridCol = (int) (childX / tileSize);
-            int gridRow = (int) (childY / tileSize);
+            int gridCol = startCol + (int) Math.round(tile.getX() / tileSize);
+            int gridRow = startRow + (int) Math.round(tile.getY() / tileSize);
 
-            if (gameBoard.isTileOccupied(gridRow, gridCol)) {
-                System.out.println("Block placement failed: Tile is already occupied.");
-                blockPane.setLayoutX(startX);
-                blockPane.setLayoutY(startY);
-                return;
-            }
-        }
+            // Create a new rectangle to represent the tile in the grid
+            Rectangle gridTile = new Rectangle(tileSize, tileSize);
+            gridTile.setFill(tile.getFill()); // Copy the block's color
+            gridTile.setStroke(tile.getStroke()); // Copy the block's stroke
 
-        // Mark the occupied tiles
-        for (int i = 0; i < blockPane.getChildren().size(); i++) {
-            double childX = blockPane.getChildren().get(i).getLayoutX() + col * tileSize;
-            double childY = blockPane.getChildren().get(i).getLayoutY() + row * tileSize;
+            // Add the new rectangle to the grid at the correct position
+            GridPane.setColumnIndex(gridTile, gridCol);
+            GridPane.setRowIndex(gridTile, gridRow);
+            gameBoard.getGameBoard().add(gridTile, gridCol, gridRow);
 
-            int gridCol = (int) (childX / tileSize);
-            int gridRow = (int) (childY / tileSize);
-
+            // Mark the tile as occupied
+            System.out.println("Block attached at grid position: " + gridCol + ", " + gridRow);
             gameBoard.setTileOccupied(gridRow, gridCol);
         }
 
-        // Set the layout position of the block to fit within the grid cell
-        blockPane.setLayoutX(col * tileSize);
-        blockPane.setLayoutY(row * tileSize);
-
-        // Add the block to the grid pane at the calculated column and row
-        gameBoard.getGameBoard().add(blockPane, col, row);
-
-        // Debugging output
-        System.out.println("Block attached at grid position: " + col + ", " + row);
+        // Check and clear filled lines after placing the block
+        gameBoard.checkAndClearFilledLines();
     }
 
-
-    private static void spawnNewBlock(Pane gameLayout, GameBoard gameBoard) {
-        Block newBlock = Block.createRandomBlock();
-        Pane blockPane = newBlock.getBlockPane();
-        double startX = 50;
-        double startY = gameBoard.getGameBoard().getBoundsInParent().getMaxY() + 20;
-        blockPane.setLayoutX(startX);
-        blockPane.setLayoutY(startY);
-        makeDraggable(blockPane, gameBoard, gameLayout);
-        gameLayout.getChildren().add(blockPane);
+    private static void spawnNewBlocks(Pane gameLayout, GameBoard gameBoard) {
+        for (int i = 0; i < 3; i++) {
+            Block newBlock = Block.createRandomBlock();
+            Pane blockPane = newBlock.getBlockPane();
+            double startX = 50 + (i * 200); // Starting X position for blocks
+            double startY = gameBoard.getGameBoard().getBoundsInParent().getMaxY() + 20; // Starting Y position for blocks below the grid
+            blockPane.setLayoutX(startX);
+            blockPane.setLayoutY(startY);
+            makeDraggable(blockPane, gameBoard, gameLayout);
+            gameLayout.getChildren().add(blockPane);
+        }
     }
 }

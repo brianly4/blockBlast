@@ -40,52 +40,169 @@ public class Block {
         return blockPane;
     }
 
-    public static List<Block> createBlocks() {
-        List<Block> blocks = new ArrayList<>();
-
-        int[][] squareShape = {
-            {1, 1},
-            {1, 1}
-        };
-
-        int[][] lShape = {
-            {1, 0, 0},
-            {1, 1, 1}
-        };
-
-        int[][] tShape = {
-            {0, 1, 0},
-            {1, 1, 1}
-        };
-
-        blocks.add(new Block(squareShape, 40, Color.BLUE));
-        blocks.add(new Block(lShape, 40, Color.RED));
-        blocks.add(new Block(tShape, 40, Color.GREEN));
-
-        return blocks;
-    }
-
     public static Block createRandomBlock() {
         Random random = new Random();
         int tileSize = 40;
 
+        // All possible block shapes
         int[][][] shapes = {
+            // Square blocks
             {
-                {1, 1},
+                {1}  
+            },
+            
+            {
+                {1, 1},  
                 {1, 1}
             },
             {
+                {1, 1, 1},  
+                {1, 1, 1},
+                {1, 1, 1}
+            },
+            // Line blocks
+            {
+                {1, 1}  
+            },
+            {
+                {1},  
+                {1}
+            },
+            {
+            	{1, 1, 1} 
+            },
+            {
+            	{1}, 
+            	{1},
+            	{1}	
+            },
+            {
+            	{1, 1, 1, 1} 
+            }, 
+            {
+            	{1}, 
+            	{1},
+            	{1},
+            	{1}
+            },
+            {
+            	{1, 1, 1, 1, 1} 
+            },
+            {
+            	{1}, 
+            	{1},
+            	{1},
+            	{1},
+            	{1}
+            },
+            // Z-shapes
+            {
+            	{0, 1, 1}, 
+            	{1, 1, 0}
+            },
+            {
+            	{1, 1, 0},
+            	{0, 1, 1}
+            },
+            {
+            	{0, 1},
+            	{1, 1},
+            	{1, 0}
+            },
+            {
+            	{1, 0},
+            	{1, 1},
+            	{0, 1}
+            },
+            // L-shapes
+            {
+            	{0, 1},
+            	{1, 1},
+            },
+            {
+            	{1, 0},
+            	{1, 1},
+            },
+            {
+            	{1, 1},
+            	{0, 1},
+            },
+            {
+            	{1, 1},
+            	{1, 0},
+            },
+            {
+            	{1, 0},
+            	{1, 0},
+            	{1, 1}
+            },
+            {
+            	{0, 1},
+            	{0, 1},
+            	{1, 1}
+            },
+            {
+            	{1, 1},
+            	{0, 1},
+            	{0, 1}
+            },
+            {
+            	{1, 1},
+            	{1, 0},
+            	{1, 0}
+            },
+            {
+            	{1, 1, 1},
+            	{0, 0, 1}
+            },
+            {
+            	{1, 1, 1},
+            	{1, 0, 0}
+            },
+            {
+            	{1, 0, 0},
+            	{1, 1, 1}
+            },
+            {
+            	{0, 0, 1},
+            	{1, 1, 1}
+            },
+            {
+                {1, 0, 0},  
                 {1, 0, 0},
                 {1, 1, 1}
             },
             {
-                {0, 1, 0},
+                {1, 1, 1},  
+                {0, 0, 1},
+                {0, 0, 1}
+            },
+            {
+                {0, 0, 1},  
+                {0, 0, 1},
                 {1, 1, 1}
-            }
+            },
+            {
+                {1, 1, 1},  
+                {1, 0, 0},
+                {1, 0, 0}
+            },
         };
 
-        Color[] colors = {Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.PURPLE};
+        // Colors for the blocks
+        Color[] colors = {
+            Color.BLUE, 
+            Color.RED, 
+            Color.GREEN, 
+            Color.YELLOW, 
+            Color.PURPLE, 
+            Color.ORANGE, 
+            Color.CYAN, 
+            Color.PINK, 
+            Color.BROWN
+        };
 
+        // Randomly select a shape and color
         int[][] shape = shapes[random.nextInt(shapes.length)];
         Color color = colors[random.nextInt(colors.length)];
 
